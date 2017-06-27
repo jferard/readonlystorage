@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,6 +86,7 @@ public class ReadOnlyStorageBuilder<K, V> {
     }
 
     private void flush() throws IOException {
+        System.out.println(Arrays.asList(this.table));
         File f = new File(this.directory, "ros" + this.files.size() + ".rbf");
         OutputStream os = new FileOutputStream(f);
         os.write(1);

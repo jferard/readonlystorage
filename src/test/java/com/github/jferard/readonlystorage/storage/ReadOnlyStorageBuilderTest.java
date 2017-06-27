@@ -23,7 +23,7 @@ public class ReadOnlyStorageBuilderTest {
 		EntryFactory<String, Integer> ef = new EntryFactory<String, Integer>(10);
 		FlusherFactory<String, Integer> ff = new MyFlushFactory();
 		MyTypesSerializer mts = new MyTypesSerializer();
-		ReadOnlyStorageBuilder<String, Integer> rosb = ReadOnlyStorageBuilder.create(new File("."),
+		ReadOnlyStorageBuilder<String, Integer> rosb = ReadOnlyStorageBuilder.create(new File("temp_files"),
 				1000, 1000, ef, ff);
 		Random r = new Random();
 		r.setSeed(Calendar.getInstance().getTimeInMillis());

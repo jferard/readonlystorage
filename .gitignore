@@ -24,3 +24,5 @@ target
 # mvn release
 release.properties
 pom.xml.*
+
+temp_files
