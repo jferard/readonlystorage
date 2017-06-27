@@ -1,5 +1,6 @@
 package com.github.jferard.readonlystorage.storage;
 
+import net.jpountz.lz4.LZ4Compressor;
 import org.junit.Test;
 
 import java.io.*;
@@ -19,11 +20,11 @@ public class ReadOnlyStorageBuilderTest {
 
 	@Test
 	public void test() throws IOException {
-		Serializer<String> iss = new StringSerializer();
-		Serializer<Integer> isi = new IntegerSerializer();
-		EntryFactory<String, Integer> ef = null;
+		EntryFactory<String, Integer> ef = new EntryFactory<String, Integer>(10);
+		FlusherFactory<String, Integer> ff = new MyFlushFactory();
+		MyTypesSerializer mts = new MyTypesSerializer();
 		ReadOnlyStorageBuilder<String, Integer> rosb = ReadOnlyStorageBuilder.create(new File("."),
-				1000, 1000, ef, iss, isi);
+				1000, 1000, ef, ff);
 		Random r = new Random();
 		r.setSeed(Calendar.getInstance().getTimeInMillis());
 		for (int i=0; i<100000; i++) {
@@ -33,28 +34,23 @@ public class ReadOnlyStorageBuilderTest {
 	}
 }
 
-class IntegerSerializer implements Serializer<Integer> {
+class MyFlushFactory implements FlusherFactory<String, Integer> {
 	@Override
-	public void serialize(Integer data, OutputStream is) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(new PipedOutputStream());
-		oos.write(data);
-	}
-
-	@Override
-	public Integer deserialize(InputStream os) throws IOException {
-		return null;
+	public TableFlusher<String, Integer> create(OutputStream os) throws IOException {
+		TypesSerializer<String, Integer> ts = new MyTypesSerializer();
+		Serializer<String, Integer> s = Serializer.create(os, ts);
+		return new DefaultTableFlusher<String, Integer>(s);
 	}
 }
 
-class StringSerializer implements Serializer<String> {
+class MyTypesSerializer implements TypesSerializer<String, Integer> {
 	@Override
-	public void serialize(String data, OutputStream is) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(new PipedOutputStream());
-		oos.write(data.getBytes());
+	public void serializeKey(ObjectOutputStream os, String data) throws IOException {
+		os.write(data.getBytes());
 	}
 
 	@Override
-	public String deserialize(InputStream os) throws IOException {
-		return null;
+	public void serializeValue(ObjectOutputStream os, Integer data) throws IOException {
+		os.write(data);
 	}
 }

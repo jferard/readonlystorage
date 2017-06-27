@@ -22,17 +22,17 @@ package com.github.jferard.readonlystorage.storage;
 /**
  */
 public class EntryFactory<K, V> {
-	private int size;
+	private int expectedSize;
 
-	public EntryFactory(int size) {
-		this.size = size;
+	public EntryFactory(int expectedSize) {
+		this.expectedSize = expectedSize;
 	}
 
 	public Entry<K, V> create(K key, V value) {
-		return new UniqueEntry<K, V>(this.size, key, value);
+		return new UniqueEntry<K, V>(this.expectedSize, key, value);
 	}
 
-	public int getSize() {
-		return size;
+	public int getExpectedSize() {
+		return expectedSize;
 	}
 }

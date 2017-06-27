@@ -29,28 +29,28 @@ import java.util.List;
 /**
  */
 public class ReadOnlyStorageBuilder<K, V> {
+    public static <L, W> ReadOnlyStorageBuilder<L, W> create(File directory, int tableLength, int maxEntries,
+                                                             EntryFactory<L, W> entryFactory, FlusherFactory<L, W> flusherFactory) {
+        Entry<L, W>[] table = (Entry<L, W>[]) new Entry[tableLength];
+        return new ReadOnlyStorageBuilder(directory, table, maxEntries, entryFactory, flusherFactory);
+    }
+
     private final List<File> files;
     private final File directory;
     private int count;
     private Entry<K, V>[] table;
     private EntryFactory<K, V> entryFactory;
     private int maxEntries;
-    private TableFlusher flusher;
-
-    public static <L, W> ReadOnlyStorageBuilder<L, W> create(File directory, int tableLength, int maxEntries,
-                                                             EntryFactory<L, W> entryFactory, Serializer<L> sk, Serializer<W> sv) {
-        Entry<L, W>[] table = (Entry<L, W>[]) new Entry[tableLength];
-        TableFlusher<L, W> flusher = DefaultTableFlusher.create(sk, sv);
-        return new ReadOnlyStorageBuilder(directory, table, maxEntries, entryFactory, flusher);
-    }
+    private FlusherFactory<K, V> flusherFactory;
 
 
-    public ReadOnlyStorageBuilder(File directory, Entry<K, V>[] table, int maxEntries, EntryFactory<K, V> entryFactory, TableFlusher flusher) {
+    public ReadOnlyStorageBuilder(File directory, Entry[] table, int maxEntries,
+                                  EntryFactory entryFactory, FlusherFactory<K, V> flusherFactory) {
         this.directory = directory;
         this.table = table;
         this.entryFactory = entryFactory;
         this.maxEntries = maxEntries;
-        this.flusher = flusher;
+        this.flusherFactory = flusherFactory;
         this.count = 0;
         this.files = new ArrayList<File>();
     }
@@ -87,8 +87,10 @@ public class ReadOnlyStorageBuilder<K, V> {
     private void flush() throws IOException {
         File f = new File(this.directory, "ros" + this.files.size() + ".rbf");
         OutputStream os = new FileOutputStream(f);
+        os.write(1);
+        TableFlusher<K, V> flusher = this.flusherFactory.create(os);
         try {
-            this.flusher.flush(this.table, os);
+            flusher.flush(this.table);
             this.files.add(f);
         } finally {
             os.close();

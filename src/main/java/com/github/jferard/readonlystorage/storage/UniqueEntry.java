@@ -63,7 +63,7 @@ public class UniqueEntry<K, V> implements Entry<K,V> {
 	}
 
 	@Override
-	public Map<K, List<V>> getMaps() {
+	public Map<K, List<V>> getMap() {
 		Map<K, List<V>> map = new HashMap<K, List<V>>(1);
 		map.put(this.key, this.values);
 		return map;

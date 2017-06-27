@@ -23,10 +23,8 @@ import java.io.*;
 
 /**
  */
-public class IntSerializer {
+public class Deserializer {
     public void serialize(int data, OutputStream os) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.write(data);
     }
 
     public int deserialize(InputStream is) throws IOException {

@@ -61,7 +61,7 @@ public class EntryMap<K, V> implements Entry<K, V> {
     }
 
     @Override
-    public Map<K, List<V>> getMaps() {
+    public Map<K, List<V>> getMap() {
         return this.map;
     }
 

@@ -19,14 +19,48 @@
 
 package com.github.jferard.readonlystorage.storage;
 
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
-public interface Serializer<S> {
-	void serialize(S data, OutputStream os) throws IOException;
+public class Serializer<K, V> {
+    private static final int BLOCK_SIZE = 1024 * 1024;
 
-	S deserialize(InputStream os) throws IOException;
+    public static <L, W> Serializer create(OutputStream os, TypesSerializer<L, W> typesSerializer) throws IOException {
+        return new Serializer(os, BLOCK_SIZE, LZ4Factory.nativeInstance().fastCompressor(), typesSerializer);
+    }
+
+    private final ObjectOutputStream os;
+    private TypesSerializer<K, V> typesSerializer;
+
+    Serializer(OutputStream os, final int blockSize, final LZ4Compressor compressor, final TypesSerializer<K, V> typesSerializer) throws IOException {
+        this.typesSerializer = typesSerializer;
+        OutputStream lz4Os = new LZ4BlockOutputStream(os, blockSize, compressor);
+        this.os = new ObjectOutputStream(lz4Os);
+    }
+
+    public void serializeMap(Map<K, List<V>> map) throws IOException {
+        this.serializeInt(map.size()); // number of keys
+        for (Map.Entry<K, List<V>> entry : map.entrySet()) {
+            K key = entry.getKey();
+            List<V> values = entry.getValue();
+            this.typesSerializer.serializeKey(os, key); // key n
+            this.serializeInt(values.size()); // number of values
+            for (V value : values) {
+                this.typesSerializer.serializeValue(os, value); // value p
+            }
+        }
+    }
+
+    public void serializeInt(int data) throws IOException {
+        this.os.write(data);
+    }
 }
