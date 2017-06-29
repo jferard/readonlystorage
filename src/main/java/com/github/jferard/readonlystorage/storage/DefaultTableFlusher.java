@@ -26,14 +26,15 @@ import java.util.Map;
 
 /**
  * A DefaultTableFlusher flushes the table to a file. The format is:
- * [cell index][number of keys]
- *      [key 0][number of values]
- *          [value 0]
- *          ...
- *          [value v-1]
- *      ...
- *      [key k-1]...
- *          ...
+ * [cell index]
+ *      [number of keys]                \
+ *      [key 0][number of values]       |
+ *          [value 0]                   \
+ *          ...                          >  [map n]
+ *          [value v-1]                 /
+ *      ...                             |
+ *      [key k-1]...                    |
+ *          ...                         /
  *
  *  ...
  */
@@ -50,11 +51,15 @@ public class DefaultTableFlusher<K, V> implements TableFlusher<K, V> {
             Entry<K, V> e = table[i];
             if (e != null) {
                 this.serializer.serializeInt(i); // cell index
-                Map<K, List<V>> map = e.getMap();
+                List<Pair<K, List<V>>> map = e.getMap();
                 this.serializer.serializeMap(map); // number of keys
                 score++;
             }
         }
         return score;
+    }
+
+    public void close() throws IOException {
+        this.serializer.close();
     }
 }

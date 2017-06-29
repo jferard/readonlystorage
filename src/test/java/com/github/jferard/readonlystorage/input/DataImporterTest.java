@@ -14,7 +14,6 @@ import java.util.Arrays;
  * Created by jferard on 05/06/17.
  */
 public class DataImporterTest {
-    @Test
     public void test() throws IOException {
         CSVParser parser = CSVFormat.RFC4180.parse(new StringReader("1,abc\n2,cdef"));
         DataImporter importer = new DataImporter(Arrays.asList(new StoreField("f1", 1, null), new StringField("f2", 1, null)));

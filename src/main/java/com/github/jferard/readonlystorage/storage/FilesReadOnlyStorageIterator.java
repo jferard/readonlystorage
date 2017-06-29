@@ -20,33 +20,51 @@
 package com.github.jferard.readonlystorage.storage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
- * Created by Julien on 03/06/2017.
+ * Created by jferard on 03/06/2017.
  */
-public class FilesReadOnlyStorageIterator<K, V> implements Iterator<V> {
-	private int index;
-	private List<File> files;
+public class FilesReadOnlyStorageIterator<K extends Comparable<K>, V> implements Iterator<Pair<K, List<V>>> {
+	private final PriorityQueue<StreamProgress<K,V>> progresses;
 
-	public FilesReadOnlyStorageIterator(List<File> files) {
-		this.files = files;
-		// open streams
+	public FilesReadOnlyStorageIterator(List<File> files, TypesDeserializer<K, V> typesDeserializer) throws IOException {
+		this.progresses = new PriorityQueue<StreamProgress<K,V>>(files.size());
+		for (File file : files) {
+			FileInputStream is = new FileInputStream(file);
+			Deserializer<K, V> deserializer = Deserializer.create(is, typesDeserializer);
+			StreamProgress<K,V> progress = new StreamProgress<K, V>(deserializer);
+			progresses.add(progress);
+		}
+		System.out.println(this.progresses);
 	}
 
 	@Override
 	public boolean hasNext() {
-		// iterator on merge keys
-
-		// priority queue
-		// or add++
-		return false;
+		StreamProgress<K, V> progress = this.progresses.peek();
+		if (progress == null)
+			return false;
+		while (!progress.hasNext()) {
+			this.progresses.poll();
+			progress = this.progresses.peek();
+			if (progress == null)
+				return false;
+		}
+		return progress.hasNext();
 	}
 
 	@Override
-	public V next() {
-		return null;
+	public Pair<K, List<V>> next() {
+		StreamProgress<K, V> progress = this.progresses.poll();
+		while (!progress.hasNext())
+			progress = this.progresses.poll();
+		Pair<K, List<V>> ret = progress.next();
+		this.progresses.offer(progress);
+		return ret;
 	}
 
 	@Override

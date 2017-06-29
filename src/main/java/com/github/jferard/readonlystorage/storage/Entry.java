@@ -41,10 +41,5 @@ public interface Entry<K, V> {
 	 */
 	Iterator<V> getListIterator();
 
-	/**
-	 * @return an iterator on iterables. That means : collections of values by iterator.
-	 */
-	Iterator<? extends Iterable<V>> getMapIterator();
-
-	Map<K, List<V>> getMap();
+	List<Pair<K, List<V>>> getMap();
 }

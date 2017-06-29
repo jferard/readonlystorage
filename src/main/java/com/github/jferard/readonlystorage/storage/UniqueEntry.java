@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * A UniqueEntry : one key and many values.
  */
-public class UniqueEntry<K, V> implements Entry<K,V> {
+public class UniqueEntry<K extends Comparable<K>, V> implements Entry<K,V> {
 	private int expectedSize;
 	private final K key;
 	private final List<V> values;
@@ -58,15 +58,8 @@ public class UniqueEntry<K, V> implements Entry<K,V> {
 	}
 
 	@Override
-	public Iterator<? extends Iterable<V>> getMapIterator() {
-		return null;
-	}
-
-	@Override
-	public Map<K, List<V>> getMap() {
-		Map<K, List<V>> map = new HashMap<K, List<V>>(1);
-		map.put(this.key, this.values);
-		return map;
+	public List<Pair<K, List<V>>> getMap() {
+		return Arrays.asList(new Pair<K, List<V>>(this.key, this.values));
 	}
 
 	@Override

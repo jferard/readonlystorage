@@ -24,16 +24,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  */
-public class ReadOnlyStorageBuilder<K, V> {
-    public static <L, W> ReadOnlyStorageBuilder<L, W> create(File directory, int tableLength, int maxEntries,
-                                                             EntryFactory<L, W> entryFactory, FlusherFactory<L, W> flusherFactory) {
+public class ReadOnlyStorageBuilder<K extends Comparable<K>, V> {
+    public static <L extends Comparable<L>, W> ReadOnlyStorageBuilder<L, W> create(File directory, int tableLength, int maxEntries,
+                                                                                   EntryFactory<L, W> entryFactory, FlusherFactory<L, W> flusherFactory, TypesDeserializer<L, W> typesDeserializer) {
         Entry<L, W>[] table = (Entry<L, W>[]) new Entry[tableLength];
-        return new ReadOnlyStorageBuilder(directory, table, maxEntries, entryFactory, flusherFactory);
+        return new ReadOnlyStorageBuilder(directory, table, maxEntries, entryFactory, flusherFactory, typesDeserializer);
     }
 
     private final List<File> files;
@@ -43,15 +42,17 @@ public class ReadOnlyStorageBuilder<K, V> {
     private EntryFactory<K, V> entryFactory;
     private int maxEntries;
     private FlusherFactory<K, V> flusherFactory;
+    private TypesDeserializer<K, V> typesDeserializer;
 
 
     public ReadOnlyStorageBuilder(File directory, Entry[] table, int maxEntries,
-                                  EntryFactory entryFactory, FlusherFactory<K, V> flusherFactory) {
+                                  EntryFactory entryFactory, FlusherFactory<K, V> flusherFactory, TypesDeserializer<K, V> typesDeserializer) {
         this.directory = directory;
         this.table = table;
         this.entryFactory = entryFactory;
         this.maxEntries = maxEntries;
         this.flusherFactory = flusherFactory;
+        this.typesDeserializer = typesDeserializer;
         this.count = 0;
         this.files = new ArrayList<File>();
     }
@@ -86,16 +87,14 @@ public class ReadOnlyStorageBuilder<K, V> {
     }
 
     private void flush() throws IOException {
-        System.out.println(Arrays.asList(this.table));
         File f = new File(this.directory, "ros" + this.files.size() + ".rbf");
         OutputStream os = new FileOutputStream(f);
-        os.write(1);
         TableFlusher<K, V> flusher = this.flusherFactory.create(os);
         try {
             flusher.flush(this.table);
             this.files.add(f);
         } finally {
-            os.close();
+            flusher.close();
         }
         this.table = (Entry<K, V>[]) new Entry[this.table.length];
         this.count = 0;
@@ -109,7 +108,7 @@ public class ReadOnlyStorageBuilder<K, V> {
             return new InMemoryReadOnlyStorage<K, V>(this.table);
         } else {
             this.flush();
-            return new FilesReadOnlyStorage<K, V>(this.files);
+            return new FilesReadOnlyStorage<K, V>(this.files, this.typesDeserializer);
         }
     }
 }

@@ -38,4 +38,8 @@ public class Pair<K, V> {
 	public V getValue() {
 		return value;
 	}
+
+	public String toString() {
+		return "Pair["+this.key+", "+this.value+"]";
+	}
 }

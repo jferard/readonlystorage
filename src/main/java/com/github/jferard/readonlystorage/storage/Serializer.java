@@ -43,13 +43,13 @@ public class Serializer<K, V> {
 
     Serializer(OutputStream os, final int blockSize, final LZ4Compressor compressor, final TypesSerializer<K, V> typesSerializer) throws IOException {
         this.typesSerializer = typesSerializer;
-        OutputStream lz4Os = new LZ4BlockOutputStream(os, blockSize, compressor);
+        OutputStream lz4Os = os; // new LZ4BlockOutputStream(os, blockSize, compressor);
         this.os = new ObjectOutputStream(lz4Os);
     }
 
-    public void serializeMap(Map<K, List<V>> map) throws IOException {
+    public void serializeMap(List<Pair<K, List<V>>> map) throws IOException {
         this.serializeInt(map.size()); // number of keys
-        for (Map.Entry<K, List<V>> entry : map.entrySet()) {
+        for (Pair<K, List<V>> entry : map) {
             K key = entry.getKey();
             List<V> values = entry.getValue();
             this.typesSerializer.serializeKey(os, key); // key n
@@ -61,6 +61,11 @@ public class Serializer<K, V> {
     }
 
     public void serializeInt(int data) throws IOException {
-        this.os.write(data);
+        this.os.writeInt(data);
+    }
+
+    public void close() throws IOException {
+        this.os.flush();
+        this.os.close();
     }
 }

@@ -19,24 +19,13 @@
 
 package com.github.jferard.readonlystorage.storage;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import java.io.ObjectInputStream;
 
 /**
  */
-public class FilesReadOnlyStorage<K extends Comparable<K>, V> implements ReadOnlyStorage<K, V> {
-    private List<File> files;
-    private TypesDeserializer<K, V> typesDeserializer;
+public interface TypesDeserializer<K, V> {
+    K deserializeKey(ObjectInputStream is) throws IOException;
 
-    public FilesReadOnlyStorage(List<File> files, TypesDeserializer<K, V> typesDeserializer) {
-        this.files = files;
-        this.typesDeserializer = typesDeserializer;
-    }
-
-    @Override
-    public Iterator<Pair<K, List<V>>> valuesIterator() throws IOException {
-        return new FilesReadOnlyStorageIterator<K, V>(this.files, this.typesDeserializer);
-    }
+    V deserializeValue(ObjectInputStream is) throws IOException;
 }

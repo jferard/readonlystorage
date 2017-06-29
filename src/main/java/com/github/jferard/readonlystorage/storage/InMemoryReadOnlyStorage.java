@@ -20,6 +20,7 @@
 package com.github.jferard.readonlystorage.storage;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  */
@@ -31,7 +32,7 @@ public class InMemoryReadOnlyStorage<K, V> implements ReadOnlyStorage<K, V> {
 	}
 
 	@Override
-	public Iterator<V> valuesIterator() {
+	public Iterator<Pair<K, List<V>>> valuesIterator() {
 		return new InMemoryReadOnlyStorageIterator<K, V>(this.table);
 	}
 }

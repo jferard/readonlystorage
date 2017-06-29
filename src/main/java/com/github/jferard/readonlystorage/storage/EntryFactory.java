@@ -21,7 +21,7 @@ package com.github.jferard.readonlystorage.storage;
 
 /**
  */
-public class EntryFactory<K, V> {
+public class EntryFactory<K extends Comparable<K>, V> {
 	private int expectedSize;
 
 	public EntryFactory(int expectedSize) {

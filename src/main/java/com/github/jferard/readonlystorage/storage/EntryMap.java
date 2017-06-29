@@ -24,28 +24,37 @@ import java.util.*;
 /**
  * A sorted map of key -> many values
  */
-public class EntryMap<K, V> implements Entry<K, V> {
-    private final TreeMap<K, List<V>> map;
+public class EntryMap<K extends Comparable<K>, V> implements Entry<K, V> {
+    private final List<Pair<K, List<V>>> map;
     private int size;
 
     public EntryMap(final int size, K key, List<V> values, K newKey, V newValue) {
         this.size = size;
-        this.map = new TreeMap<K, List<V>>();
-        this.map.put(key, values);
+        this.map = new LinkedList<Pair<K, List<V>>>();
+        this.map.add(new Pair(key, values));
 
         List<V> newValues = new ArrayList<V>(size);
         newValues.add(newValue);
-        this.map.put(newKey, newValues);
+        if (newKey.compareTo(key) <= 0)
+            this.map.add(0, new Pair(newKey, newValues));
+        else
+            this.map.add(new Pair(newKey, newValues));
     }
 
     public Entry<K, V> add(K key, V value) {
-        Collection<V> previousList = this.map.get(key);
-        if (previousList == null) {
-            List<V> newList = new ArrayList<V>(size);
-            newList.add(value);
-            this.map.put(key, newList);
-        } else {
-            previousList.add(value);
+        int i=0;
+        for (Pair<K, List<V>> entry : this.map) {
+            if (key.compareTo(entry.getKey()) == 0) {
+                entry.getValue().add(value);
+                return this;
+            } else if (key.compareTo(entry.getKey()) < 0) {
+                i++;
+            } else {
+                List<V> values = new ArrayList<V>(size);
+                values.add(value);
+                this.map.add(i, new Pair(key, values));
+                break;
+            }
         }
         return this;
     }
@@ -56,17 +65,12 @@ public class EntryMap<K, V> implements Entry<K, V> {
     }
 
     @Override
-    public Iterator<List<V>> getMapIterator() {
-        return this.map.values().iterator();
-    }
-
-    @Override
-    public Map<K, List<V>> getMap() {
+    public List<Pair<K, List<V>>> getMap() {
         return this.map;
     }
 
     @Override
     public String toString() {
-        return "EntryMap[" + this.map.keySet().toString() + "]";
+        return "EntryMap[" + this.map.toString() + "]";
     }
 }

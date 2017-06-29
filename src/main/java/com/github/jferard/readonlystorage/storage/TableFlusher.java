@@ -19,12 +19,13 @@
 
 package com.github.jferard.readonlystorage.storage;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  * A flusher for table
  */
-public interface TableFlusher<K, V> {
+public interface TableFlusher<K, V> extends Closeable {
     int flush(Entry<K, V>[] table) throws IOException;
 }
