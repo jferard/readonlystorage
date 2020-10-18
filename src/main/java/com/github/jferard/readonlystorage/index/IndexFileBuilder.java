@@ -17,14 +17,14 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.jferard.readonlystorage.storage;
-
-import java.io.Closeable;
-import java.io.IOException;
+package com.github.jferard.readonlystorage.index;
 
 /**
- * A flusher for table
+ * Created by jferard on 09/07/17.
  */
-public interface TableFlusher<K, V> extends Closeable {
-    int flush(Entry<K, V>[] table, int fileNum) throws IOException;
+public class IndexFileBuilder {
+    public <V> void fill(V value, int fileNum, int offset) {
+        // maintains n files open
+        // each file stores an index on a field of value (value is an interable)
+    }
 }

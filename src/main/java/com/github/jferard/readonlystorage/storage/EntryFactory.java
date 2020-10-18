@@ -29,7 +29,7 @@ public class EntryFactory<K extends Comparable<K>, V> {
 	}
 
 	public Entry<K, V> create(K key, V value) {
-		return new UniqueEntry<K, V>(this.expectedSize, key, value);
+		return new SimpleEntry<K, V>(this.expectedSize, key, value);
 	}
 
 	public int getExpectedSize() {

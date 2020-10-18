@@ -17,14 +17,10 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.jferard.readonlystorage.storage;
+package com.github.jferard.readonlystorage.input;
 
-import java.io.Closeable;
-import java.io.IOException;
+import org.apache.commons.csv.CSVRecord;
 
-/**
- * A flusher for table
- */
-public interface TableFlusher<K, V> extends Closeable {
-    int flush(Entry<K, V>[] table, int fileNum) throws IOException;
+public interface Fields<K, V> {
+    K getKey(V row);
 }

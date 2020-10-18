@@ -19,6 +19,7 @@
 
 package com.github.jferard.readonlystorage.input;
 
+import com.github.jferard.readonlystorage.storage.ReadOnlyStorageBuilder;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
@@ -29,25 +30,27 @@ import java.util.List;
 /**
  * Created by jferard on 05/06/17.
  */
-public class DataImporter {
-    private List<Field> fields;
+public class DataImporter<K extends Comparable<K>> {
+    private ReadOnlyStorageBuilder<K, CSVRecord> builder;
+    private Fields<K, CSVRecord> fields;
 
-    public DataImporter(List<Field> fields) {
+    public DataImporter(ReadOnlyStorageBuilder<K, CSVRecord> builder, Fields<K, CSVRecord> fields) {
+        this.builder = builder;
         this.fields = fields;
     }
 
     public void importData(CSVParser parser, OutputStream os) throws IOException {
         long pos = 0;
         for (CSVRecord record : parser) {
+            K key = fields.getKey(record);
+            this.builder.put(key, record);
             for (int i=0; i<record.size(); i++) {
                 String valueAsString = record.get(i);
-                Field field = fields.get(i);
-                pos += field.write(valueAsString, os);
-                field.updateIndex(valueAsString, pos);
-            }
-            for (int i=0; i<record.size(); i++) {
-                Field field = fields.get(i);
-//                field.index().write(pos);
+                // Field field = fields.get(i);
+                // pos = storageBuilder.put(keyAsString, CSVRecord)
+                // if field has index:
+                //    os_field.write(value, pos) // see Field interface
+                //
             }
         }
     }

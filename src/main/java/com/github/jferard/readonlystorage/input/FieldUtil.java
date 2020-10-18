@@ -23,16 +23,24 @@ import com.google.common.base.Charsets;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Created by jferard on 05/06/17.
  */
 public class FieldUtil {
     public static int writeInt(int value, OutputStream os) throws IOException {
-        os.write(value >>> 24);
-        os.write(value >>> 16);
-        os.write(value >>> 8);
-        os.write(value);
+        int b1 = value >>> 24;
+        int r = b1 << 24;
+        int b2 = (value - r) >>> 16;
+        r += b2 << 16;
+        int b3 = (value - r) >>> 8;
+        r += b3 << 8;
+        int b4 = value - r;
+        os.write(b1);
+        os.write(b2);
+        os.write(b3);
+        os.write(b4);
         return 4;
     }
 
@@ -41,5 +49,13 @@ public class FieldUtil {
         FieldUtil.writeInt(bytes.length, os);
         os.write(bytes);
         return 4 + size;
+    }
+
+    public static int writeLong(long value, OutputStream os) throws IOException {
+        long big = value >>> 32;
+        long small = value - (big << 32);
+        FieldUtil.writeInt((int) big, os);
+        FieldUtil.writeInt((int) small, os);
+        return 8;
     }
 }

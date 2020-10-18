@@ -17,14 +17,37 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.jferard.readonlystorage.storage;
+package com.github.jferard.readonlystorage.input;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
- * A flusher for table
+ * Created by jferard on 05/06/17.
  */
-public interface TableFlusher<K, V> extends Closeable {
-    int flush(Entry<K, V>[] table, int fileNum) throws IOException;
+public class DateField implements Field {
+    private final String name;
+    private DateFormat format;
+
+    public DateField(String name, DateFormat format) {
+        this.name = name;
+        this.format = format;
+    }
+
+    @Override
+    public int write(String valueAsString, OutputStream os) throws IOException {
+        Date parse = null;
+        try {
+            parse = format.parse(valueAsString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return FieldUtil.writeLong(parse.getTime(), os);
+    }
+
+    @Override
+    public void updateIndex(String valueAsString, long pos) {}
 }

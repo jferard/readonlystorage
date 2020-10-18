@@ -26,5 +26,5 @@ import java.io.OutputStream;
  * Created by jferard on 26/06/17.
  */
 public interface FlusherFactory<K, V> {
-    public TableFlusher<K, V> create(OutputStream os) throws IOException;
+    TableFlusher<K, V> create(OutputStream os) throws IOException;
 }

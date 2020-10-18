@@ -22,9 +22,7 @@ package com.github.jferard.readonlystorage.storage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * Created by jferard on 03/06/2017.
@@ -32,7 +30,13 @@ import java.util.PriorityQueue;
 public class FilesReadOnlyStorageIterator<K extends Comparable<K>, V> implements Iterator<Pair<K, List<V>>> {
 	private final PriorityQueue<StreamProgress<K,V>> progresses;
 
-	public FilesReadOnlyStorageIterator(List<File> files, TypesDeserializer<K, V> typesDeserializer) throws IOException {
+	/**
+	 * Create a new iterator on files.
+	 * @param files the files
+	 * @param typesDeserializer the types deserializer
+	 * @throws IOException if an I/O error occurs
+	 */
+	public FilesReadOnlyStorageIterator(Collection<File> files, TypesDeserializer<K, V> typesDeserializer) throws IOException {
 		this.progresses = new PriorityQueue<StreamProgress<K,V>>(files.size());
 		for (File file : files) {
 			FileInputStream is = new FileInputStream(file);

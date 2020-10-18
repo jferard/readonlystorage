@@ -19,23 +19,26 @@
 
 package com.github.jferard.readonlystorage.storage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * A UniqueEntry : one key and many values.
+ * A SimpleEntry : one key and many values.
  */
-public class UniqueEntry<K extends Comparable<K>, V> implements Entry<K,V> {
+public class SimpleEntry<K extends Comparable<K>, V> implements Entry<K,V> {
 	private int expectedSize;
 	private final K key;
 	private final List<V> values;
 
 	/**
 	 * Create the entry and add the current (key, value) couple
-	 * @param expectedSize
-	 * @param key
-	 * @param value
+	 * @param expectedSize the expected number of keys
+	 * @param key the first key
+	 * @param value the first value
 	 */
-	public UniqueEntry(int expectedSize, K key, V value) {
+	public SimpleEntry(int expectedSize, K key, V value) {
 		this.expectedSize = expectedSize;
 		this.key = key;
 		this.values = new ArrayList<V>(expectedSize);
@@ -64,6 +67,6 @@ public class UniqueEntry<K extends Comparable<K>, V> implements Entry<K,V> {
 
 	@Override
 	public String toString() {
-		return "UniqueEntry["+this.key+"]";
+		return "SimpleEntry["+this.key+"]";
 	}
 }

@@ -24,7 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by jferard on 28/06/17.
+ * A stream progress is an iterator on pairs of keys (K) and lst of values (V).
+ * Stream progresses may be sorted on ...
+ * @author Julien Férard
  */
 public class StreamProgress<K extends Comparable<K>, V> implements Comparable<StreamProgress<K, V>>, Iterator<Pair<K, List<V>>> {
     private Deserializer<K, V> deserializer;

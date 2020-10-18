@@ -25,7 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jferard on 05/06/17.
+ * A builder for data importer.
+ *
+ * Add necessary fields to the list, then build the builder.
+ *
+ * @author Julien Férard
  */
 public class DataImporterBuilder {
     private final List<Field> fields;
@@ -46,6 +50,7 @@ public class DataImporterBuilder {
     }
 
     public DataImporter build() {
-        return new DataImporter(this.fields);
+        return null;
+        // new DataImporter(this.fields);
     }
 }

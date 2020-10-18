@@ -25,7 +25,7 @@ import java.io.ObjectOutputStream;
 /**
  */
 public interface TypesSerializer<K, V> {
-    void serializeKey(ObjectOutputStream os, K data) throws IOException;
+    int serializeKey(ObjectOutputStream os, K data) throws IOException;
 
-    void serializeValue(ObjectOutputStream os, V data) throws IOException;
+    int serializeValue(ObjectOutputStream os, V data) throws IOException;
 }

@@ -58,17 +58,25 @@ public class ReadOnlyStorageBuilder<K extends Comparable<K>, V> {
     }
 
     /**
+     * Add a new key/value pair.
      * @param key   the key to add
      * @param value the value
      */
     public void put(K key, V value) throws IOException {
-        int index = getIndex(key);
+        int index = this.getIndex(key);
         this.addEntry(key, value, index);
-        if (++this.count == this.maxEntries) { // time to flush
+        this.count++;
+        if (this.count == this.maxEntries) { // time to flush
             this.flush();
         }
     }
 
+    /**
+     * Add a key/value pair at an index
+     * @param key the key
+     * @param value the value
+     * @param index the index (0..table.length-1)
+     */
     private void addEntry(K key, V value, int index) {
         Entry<K, V> previousEntry = this.table[index];
         Entry<K, V> e;
@@ -80,9 +88,13 @@ public class ReadOnlyStorageBuilder<K extends Comparable<K>, V> {
         this.table[index] = e;
     }
 
+    /**
+     * @param key the key
+     * @return an index between 0 and table.length-1
+     */
     private int getIndex(K key) {
         int h = key.hashCode();
-        int hash = h ^ (h >>> 16);
+        int hash = h ^ (h >>> 16); // h xor h/2^16
         return hash % table.length;
     }
 
@@ -91,7 +103,7 @@ public class ReadOnlyStorageBuilder<K extends Comparable<K>, V> {
         OutputStream os = new FileOutputStream(f);
         TableFlusher<K, V> flusher = this.flusherFactory.create(os);
         try {
-            flusher.flush(this.table);
+            flusher.flush(this.table, this.files.size());
             this.files.add(f);
         } finally {
             flusher.close();

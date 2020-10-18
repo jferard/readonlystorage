@@ -24,7 +24,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A ReadOnlyStorage gives a restitution of the values grouped by keys
+ * A ReadOnlyStorage gives a restitution of the values grouped by keys.
+ * It may be an in memory storage if the builder did not generate any file, or a
+ * file storage if some files where flushed.
+ *
+ * A ReadOnlyStorage will render values in a specific order: first by key hash (mod table length),
+ * then by key.
+ *
  */
 public interface ReadOnlyStorage<K, V> {
 	/** @return an iterator on values */

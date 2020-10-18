@@ -20,9 +20,7 @@
 package com.github.jferard.readonlystorage.storage;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A DefaultTableFlusher flushes the table to a file. The format is:
@@ -45,14 +43,14 @@ public class DefaultTableFlusher<K, V> implements TableFlusher<K, V> {
         this.serializer = serializer;
     }
 
-    public int flush(Entry<K, V>[] table) throws IOException {
+    public int flush(Entry<K, V>[] table, int fileNum) throws IOException {
         int score = 0;
         for (int i = 0; i < table.length; i++) {
             Entry<K, V> e = table[i];
             if (e != null) {
                 this.serializer.serializeInt(i); // cell index
                 List<Pair<K, List<V>>> map = e.getMap();
-                this.serializer.serializeMap(map); // number of keys
+                this.serializer.serializeMap(map, fileNum); // number of keys
                 score++;
             }
         }

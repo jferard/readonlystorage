@@ -21,25 +21,31 @@ package com.github.jferard.readonlystorage.storage;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
- * An entry in the hash table. May be a UniqueEntry (one key) or a sorted EntryMap (several keys).
+ * An entry in the (hash) table.
+ * As in a standard hash map, several keys may have the same hash (mod the size of the table),
+ * and thus use the same cell of the array.
+ * Therefore, the entry may be a SimpleEntry (one key) or an EntryMap (several keys).
+ * The special feature is that the EntryMap is ordered by keys, allowing to scan several parallel
+ * tables in the same order.
  */
 public interface Entry<K, V> {
 
-	/**
-	 * Try to add a	(key, value) couple to the current entry. If it works, return this, else return a EntryMap.
-	 * @param key a key
-	 * @param value a value
-	 * @return this or a new EntryMap if there is a new key
-	 */
-	Entry<K, V> add(K key, V value);
+    /**
+     * Try to add a	(key, value) couple to the current entry.
+     * If it works, return this, else return a EntryMap.
+     *
+     * @param key   a key
+     * @param value a value
+     * @return this or a new EntryMap if there is a new key
+     */
+    Entry<K, V> add(K key, V value);
 
-	/**
-	 * @return an iterator on values
-	 */
-	Iterator<V> getListIterator();
+    /**
+     * @return an iterator on values
+     */
+    Iterator<V> getListIterator();
 
-	List<Pair<K, List<V>>> getMap();
+    List<Pair<K, List<V>>> getMap();
 }
